@@ -47,7 +47,13 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">= 3.11"
 authors = [{ name = "Derek Wan", email = "d.wan@icloud.com" }]
-dependencies = []
+dependencies = [
+  "fastapi",
+  "jinja2",
+  "python-multipart",
+  "sqlalchemy",
+  "uvicorn",
+]
 
 [project.optional-dependencies]
 dev = [

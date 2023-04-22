@@ -5,7 +5,9 @@
 #    pip-compile --allow-unsafe --extra=dev --output-file=requirements-dev.txt pyproject.toml
 #
 anyio==3.6.2
-    # via httpcore
+    # via
+    #   httpcore
+    #   starlette
 atomicwrites==1.4.1
     # via dycw-utilities
 attrs==23.1.0
@@ -26,7 +28,8 @@ click==8.1.3
     #   hatch
     #   pip-tools
     #   userpath
-coverage[toml]==7.2.3
+    #   uvicorn
+coverage[toml]==7.2.5
     # via pytest-cov
 distlib==0.3.6
     # via virtualenv
@@ -38,13 +41,17 @@ exceptiongroup==1.1.1
     # via dycw-utilities
 execnet==1.9.0
     # via pytest-xdist
+fastapi==0.95.1
+    # via app (pyproject.toml)
 filelock==3.12.0
     # via virtualenv
 h11==0.14.0
-    # via httpcore
+    # via
+    #   httpcore
+    #   uvicorn
 hatch==1.7.0
     # via app (pyproject.toml)
-hatchling==1.14.0
+hatchling==1.14.1
     # via hatch
 httpcore==0.17.0
     # via httpx
@@ -52,7 +59,7 @@ httpx==0.24.0
     # via hatch
 hyperlink==21.0.0
     # via hatch
-hypothesis==6.72.1
+hypothesis==6.75.0
     # via dycw-utilities
 idna==3.4
     # via
@@ -65,10 +72,14 @@ iniconfig==2.0.0
     # via pytest
 jaraco-classes==3.2.3
     # via keyring
+jinja2==3.1.2
+    # via app (pyproject.toml)
 keyring==23.13.1
     # via hatch
 markdown-it-py==2.2.0
     # via rich
+markupsafe==2.1.2
+    # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
 more-itertools==9.1.0
@@ -91,7 +102,7 @@ pexpect==4.8.0
     # via hatch
 pip-tools==6.13.0
     # via app (pyproject.toml)
-platformdirs==3.2.0
+platformdirs==3.5.0
     # via
     #   black
     #   hatch
@@ -102,6 +113,8 @@ pluggy==1.0.0
     #   pytest
 ptyprocess==0.7.0
     # via pexpect
+pydantic==1.10.7
+    # via fastapi
 pygments==2.15.1
     # via rich
 pyperclip==1.8.2
@@ -133,9 +146,11 @@ pytest-xdist==3.2.1
     # via
     #   app (pyproject.toml)
     #   dycw-utilities
-rich==13.3.4
+python-multipart==0.0.6
+    # via app (pyproject.toml)
+rich==13.3.5
     # via hatch
-ruff==0.0.262
+ruff==0.0.263
     # via app (pyproject.toml)
 shellingham==1.5.0.post1
     # via hatch
@@ -146,17 +161,26 @@ sniffio==1.3.0
     #   httpx
 sortedcontainers==2.4.0
     # via hypothesis
+sqlalchemy==2.0.11
+    # via app (pyproject.toml)
+starlette==0.26.1
+    # via fastapi
 tomli-w==1.0.0
     # via hatch
-tomlkit==0.11.7
+tomlkit==0.11.8
     # via hatch
-trove-classifiers==2023.4.22
+trove-classifiers==2023.4.29
     # via hatchling
 typing-extensions==4.5.0
-    # via dycw-utilities
+    # via
+    #   dycw-utilities
+    #   pydantic
+    #   sqlalchemy
 userpath==1.8.0
     # via hatch
-virtualenv==20.22.0
+uvicorn==0.22.0
+    # via app (pyproject.toml)
+virtualenv==20.23.0
     # via hatch
 wheel==0.40.0
     # via pip-tools
@@ -164,7 +188,7 @@ zipp==3.15.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-pip==23.1.1
+pip==23.1.2
     # via pip-tools
-setuptools==67.7.1
+setuptools==67.7.2
     # via pip-tools

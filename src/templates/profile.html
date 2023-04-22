@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="{{url_for('static', path='mystyle.css')}}" />
+  </head>
+  <body>
+    <h2>Name: {{data.get('name')}}</h2>
+    <h3>Programming proficiency</h3>
+    <ul>
+      {% for lang in data.get('langs') %}
+      <b><li>{{lang}}</li></b>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

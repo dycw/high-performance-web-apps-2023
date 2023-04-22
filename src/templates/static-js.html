@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+  <head>
+    <title>My website</title>
+    <script src="{{url_for('static', path='myscript.js')}}"></script>
+  </head>
+  <body>
+    <h2>Using JavaScript in template</h2>
+    <h3>Welcome {{data.get('name')}}</h3>
+    <button onclick="myFunction()">Submit</button>
+    <p id="response"></p>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+[submodule "official-repo"]
+	path = official-repo
+	url = https://github.com/Apress/Build-High-Performance-Web-Apps-with-FastAPI-by-Malhar-Lathkar.git
