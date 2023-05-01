@@ -48,8 +48,11 @@ readme = "README.md"
 requires-python = ">= 3.11"
 authors = [{ name = "Derek Wan", email = "d.wan@icloud.com" }]
 dependencies = [
+  "aiosqlite",
+  "databases",
   "fastapi",
   "jinja2",
+  "pymongo",
   "python-multipart",
   "sqlalchemy",
   "uvicorn",
