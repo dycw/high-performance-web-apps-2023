@@ -1,85 +1,100 @@
-from fastapi import FastAPI, Form, Request, Response
+from typing import Any, Iterator, cast
+from typing import Any, Iterator
+
+from pymongo import MongoClient
+from beartype import beartype
+from databases import Database
+from fastapi import Body, Depends, FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from sqlalchemy import Column, Float, Integer, String
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine
 from uvicorn import run
 
+app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
-class Product(BaseModel):
-    prod_id: int
-    prod_name: str
-    price: float
-    stock: int
+
+DATABASE_URL = "sqlite:///./mydata.sqlite3"
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+metadata = MetaData()
+
+
+booklist = Table(
+    "booklist",
+    metadata,
+    Column("id", Integer, primary_key=True, nullable=False),
+    Column("title", String(50), unique=True),
+    Column("author", String(50)),
+    Column("price", Integer),
+    Column("publisher", String(50)),
+)
+metadata.create_all(bind=engine)
+
+
+async def get_db() -> Any:
+    db = Database(DATABASE_URL)
+    await db.connect()
+    yield db
+
+
+@beartype
+def get_collection() -> Iterator[Any]:
+    client = MongoClient()
+    yield client["mydata"]["books"]
+
+
+class Book(BaseModel):
+    id: int  # noqa: A003
+    title: str
+    author: str
+    price: int
+    publisher: str
 
     class Config:
         orm_mode = True
 
 
-Base = declarative_base()
-
-
-class ProductORM(Base):
-    __tablename__ = "products"
-
-    prod_id = Column(Integer, primary_key=True, nullable=False)
-    prod_name = Column(String(63), unique=True)
-    price = Column(Float)
-    stock = Column(Integer)
-
-
-product_alchemy = ProductORM(prod_id=1, prod_name="Ceiling Fan", price=2000, stock=50)
-product = Product.from_orm(product_alchemy)
-product_alchemy_again = ProductORM(**product.dict())
-
-
-templates = Jinja2Templates(directory="templates")
-
-
-app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-
-@app.get("/employee/{name}/{salary}")
-async def employee_salary(*, request: Request, name: str, salary: int) -> Response:
-    data = {"name": name, "salary": salary}
-    return templates.TemplateResponse(
-        "employee.html", {"request": request, "data": data}
+@app.post("/books", response_model=Book)
+@beartype
+async def add_book(*, b1: Book, db: Database = Depends(get_db)) -> str:
+    query = booklist.insert().values(
+        id=b1.id,
+        title=b1.title,
+        author=b1.author,
+        price=b1.price,
+        publisher=b1.publisher,
     )
+    await db.execute(query)
+    return "Book created successfully"
 
 
-@app.get("/profile")
-async def info(*, request: Request) -> Response:
-    data = {"name": "Ronie", "langs": ["Python", "Java", "PHP", "Swift", "Ruby"]}
-    return templates.TemplateResponse(
-        "profile.html", {"request": request, "data": data}
-    )
+@app.get("/books/{id}")
+@beartype
+async def get_book(
+    *, id: int, db: Database = Depends(get_db)  # noqa: A002
+) -> Book | None:
+    query = booklist.select().where(booklist.c.id == id)
+    return cast(Book | None, await db.fetch_one(query))
 
 
-@app.get("/testjs/{name}")
-async def jsdemo(*, request: Request, name: str) -> Response:
-    data = {"name": name}
-    return templates.TemplateResponse(
-        "static-js.html", {"request": request, "data": data}
-    )
+@app.put("/books/{id}")
+@beartype
+async def update_book(
+    *, id: int, new_price: int = Body(), db: Database = Depends(get_db)  # noqa: A002
+) -> str:
+    query = booklist.update().where(booklist.c.id == id).values(price=new_price)
+    await db.execute(query)
+    return "Book updated successfully"
 
 
-@app.get("/img/")
-async def show_image(*, request: Request) -> Response:
-    return templates.TemplateResponse("static-img.html", {"request": request})
-
-
-@app.get("/form/")
-async def form(*, request: Request) -> Response:
-    return templates.TemplateResponse("form.html", {"request": request})
-
-
-@app.post("/form/")
-async def getform(
-    *, name: str = Form(...), add: str = Form(...), post: str = Form(...)
-) -> dict[str, str]:
-    return {"Name": name, "Address": add, "Post applied": post}
+@app.delete("/books/{id}")
+@beartype
+async def delete_book(*, id: int, db: Database = Depends(get_db)) -> str:  # noqa: A002
+    query = booklist.delete().where(booklist.c.id == id)
+    await db.execute(query)
+    return "Book deleted successfully"
 
 
 if __name__ == "__main__":
