@@ -173,7 +173,7 @@ sqlalchemy==1.4.48
     # via
     #   app (pyproject.toml)
     #   databases
-starlette==0.26.1
+starlette==0.27.0
     # via fastapi
 tomli-w==1.0.0
     # via hatch
